@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>بورتفوليو | إلياس سلامه</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --accent: #e8ff47;
+      --accent2: #ff4747;
+      --text: #f0f0f0;
+      --muted: #555;
+      --border: #222;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom Cursor */
+    .cursor {
+      position: fixed;
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.2s, height 0.2s;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.15s ease;
+      opacity: 0.6;
+    }
+
+    /* ========== 3D FLOATING ELEMENTS ========== */
+    .float-3d {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+      transition: transform 0.1s linear;
+    }
+
+    .float-3d canvas {
+      display: block;
+    }
+
+    /* ========== NAV ========== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.5rem 4rem;
+      z-index: 100;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+    }
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+    .logo span { color: var(--accent); }
+    nav ul { list-style: none; display: flex; gap: 2.5rem; }
+    nav ul a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+    nav ul a:hover { color: var(--accent); }
+
+    /* ========== HERO ========== */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 50%, rgba(232,255,71,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(255,71,71,0.04) 0%, transparent 50%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 800px; }
+    .hero-tag {
+      display: inline-block;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      padding: 0.4rem 1rem;
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      animation: fadeUp 0.6s ease both;
+    }
+    h1 {
+      font-size: clamp(3.5rem, 9vw, 8rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -3px;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+    h1 .line2 { color: var(--accent); display: block; }
+    .hero-sub {
+      margin-top: 2rem;
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.7;
+      font-weight: 300;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+    .hero-cta {
+      margin-top: 3rem;
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+    .btn {
+      padding: 0.9rem 2.2rem;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      cursor: none;
+      letter-spacing: 1px;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: #fff; transform: translateY(-2px); }
+    .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      color: var(--muted); font-size: 0.75rem; letter-spacing: 2px;
+      animation: fadeUp 1s 0.8s ease both;
+    }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--muted), transparent);
+      animation: scrollDown 1.5s ease-in-out infinite;
+    }
+    @keyframes scrollDown {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      51% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ========== MARQUEE ========== */
+    .marquee-wrap {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      padding: 1rem 0;
+      background: var(--surface);
+      position: relative; z-index: 1;
+    }
+    .marquee {
+      display: flex; gap: 3rem;
+      animation: marquee 18s linear infinite;
+      width: max-content;
+    }
+    .marquee span {
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .marquee span.dot { color: var(--accent); font-size: 1.2rem; line-height: 1; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ========== SECTION ========== */
+    section { padding: 7rem 4rem; position: relative; z-index: 1; }
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 3rem;
+    }
+
+    /* ========== ABOUT ========== */
+    #about {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+    .about-visual { position: relative; height: 500px; }
+    .about-box { position: absolute; background: var(--surface); border: 1px solid var(--border); }
+    .about-box.main {
+      inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .about-box.main::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(232,255,71,0.08) 0%, transparent 60%);
+    }
+    .about-initials {
+      font-size: 10rem;
+      font-weight: 900;
+      color: rgba(232,255,71,0.08);
+      letter-spacing: -8px;
+      line-height: 1;
+      user-select: none;
+    }
+    .about-badge {
+      position: absolute;
+      bottom: -1.5rem; left: -1.5rem;
+      background: var(--accent);
+      color: #000;
+      padding: 1.2rem 1.5rem;
+      font-weight: 900;
+      font-size: 0.85rem;
+    }
+    .about-years {
+      position: absolute;
+      top: -1.5rem; right: -1.5rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      padding: 1rem 1.2rem;
+      text-align: center;
+    }
+    .about-years strong { display: block; font-size: 2.5rem; font-weight: 900; color: var(--accent); }
+    .about-years span { font-size: 0.7rem; color: var(--muted); letter-spacing: 2px; }
+
+    .about-text p {
+      color: #aaa;
+      line-height: 1.9;
+      font-size: 1rem;
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+    }
+    .skills-list { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; }
+    .skill-tag {
+      border: 1px solid var(--border);
+      padding: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .skill-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ========== PORTFOLIO ========== */
+    #portfolio { background: var(--surface); }
+    .portfolio-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 3rem;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .filter-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.4rem 1rem;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.8rem;
+      cursor: none;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+    }
+    .portfolio-item {
+      position: relative;
+      aspect-ratio: 1;
+      background: var(--bg);
+      overflow: hidden;
+      cursor: none;
+    }
+    .portfolio-item:first-child { grid-column: span 2; aspect-ratio: auto; min-height: 400px; }
+
+    .p-visual {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem;
+      transition: transform 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .p-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    /* fallback bg colors */
+    .portfolio-item:nth-child(1) .p-visual { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); }
+    .portfolio-item:nth-child(2) .p-visual { background: linear-gradient(135deg, #2d1b00, #4a2f00, #ff8c00); }
+    .portfolio-item:nth-child(3) .p-visual { background: linear-gradient(135deg, #0a2a0a, #1a4a1a, #2d7a2d); }
+    .portfolio-item:nth-child(4) .p-visual { background: linear-gradient(135deg, #1a002a, #2a004a, #7b00ff); }
+    .portfolio-item:nth-child(5) .p-visual { background: linear-gradient(135deg, #2a0000, #4a0000, #cc0000); }
+
+    .p-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.88);
+      display: flex; flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .portfolio-item:hover .p-overlay { opacity: 1; }
+    .portfolio-item:hover .p-visual img { transform: scale(1.08); }
+    .portfolio-item:hover .p-visual { transform: scale(1.03); }
+
+    .p-cat { font-size: 0.7rem; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 0.4rem; }
+    .p-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .p-desc { font-size: 0.85rem; color: #888; line-height: 1.6; }
+    .p-arrow {
+      position: absolute; top: 1.5rem; left: 1.5rem;
+      width: 36px; height: 36px;
+      border: 1px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+      font-size: 1rem;
+    }
+
+    /* ========== SERVICES ========== */
+    #services .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .service-card {
+      background: var(--bg);
+      padding: 3rem 2.5rem;
+      transition: background 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-card:hover { background: #0f0f0f; }
+    .service-icon { font-size: 2.5rem; margin-bottom: 1.5rem; display: block; }
+    .service-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.8rem; }
+    .service-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; font-weight: 300; }
+    .service-num {
+      position: absolute; top: 2rem; left: 2.5rem;
+      font-size: 4rem;
+      font-weight: 900;
+      color: rgba(232,255,71,0.05);
+      line-height: 1;
+    }
+
+    /* ========== CONTACT ========== */
+    #contact {
+      background: var(--surface);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #contact::before {
+      content: 'CONTACT';
+      position: absolute;
+      font-size: 20vw;
+      font-weight: 900;
+      color: rgba(255,255,255,0.02);
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+      letter-spacing: -5px;
+    }
+    #contact .section-title { font-size: clamp(2.5rem, 6vw, 5rem); }
+    .contact-email {
+      display: inline-block;
+      font-size: clamp(1rem, 2.5vw, 1.8rem);
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(232,255,71,0.3);
+      padding-bottom: 0.3rem;
+      margin: 2rem 0 1rem;
+      transition: border-color 0.2s;
+      word-break: break-all;
+    }
+    .contact-email:hover { border-color: var(--accent); }
+    .contact-phone {
+      display: block;
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+      text-decoration: none;
+      letter-spacing: 2px;
+    }
+    .contact-phone:hover { color: var(--accent); }
+    .social-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+    .social-link {
+      border: 1px solid var(--border);
+      padding: 0.7rem 1.8rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 2px;
+      transition: all 0.2s;
+    }
+    .social-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ========== FOOTER ========== */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 4rem;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--muted); font-size: 0.8rem;
+      flex-wrap: wrap; gap: 1rem;
+      position: relative; z-index: 1;
+    }
+
+    /* ========== ANIMATIONS ========== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ========== 3D SHAPES CSS ========== */
+    .shape-3d {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+      will-change: transform;
+    }
+    .shape-3d svg {
+      filter: drop-shadow(0 0 20px rgba(232,255,71,0.15));
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 900px) {
+      nav { padding: 1.5rem 2rem; }
+      nav ul { display: none; }
+      #hero { padding: 0 2rem; }
+      section { padding: 5rem 2rem; }
+      #about { grid-template-columns: 1fr; }
+      .about-visual { height: 300px; }
+      .portfolio-grid { grid-template-columns: 1fr 1fr; }
+      .portfolio-item:first-child { grid-column: span 2; }
+      #services .services-grid { grid-template-columns: 1fr; }
+      footer { padding: 2rem; }
+      .shape-3d { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- 3D Floating Shapes -->
+  <div class="shape-3d" id="shape1" style="top:15vh; right:8vw; width:120px; height:120px;">
+    <svg viewBox="0 0 120 120" width="120" height="120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#e8ff47;stop-opacity:0.8"/>
+          <stop offset="100%" style="stop-color:#e8ff47;stop-opacity:0.1"/>
+        </linearGradient>
+      </defs>
+      <!-- Cube wireframe -->
+      <polygon points="60,10 110,35 110,85 60,110 10,85 10,35" fill="none" stroke="#e8ff47" stroke-width="1" opacity="0.4"/>
+      <polygon points="60,10 110,35 60,60 10,35" fill="url(#g1)" opacity="0.15"/>
+      <polygon points="110,35 110,85 60,110 60,60" fill="url(#g1)" opacity="0.1"/>
+      <polygon points="10,35 60,60 60,110 10,85" fill="url(#g1)" opacity="0.08"/>
+      <line x1="60" y1="10" x2="60" y2="60" stroke="#e8ff47" stroke-width="0.8" opacity="0.5"/>
+      <line x1="110" y1="35" x2="60" y2="60" stroke="#e8ff47" stroke-width="0.8" opacity="0.5"/>
+      <line x1="10" y1="35" x2="60" y2="60" stroke="#e8ff47" stroke-width="0.8" opacity="0.5"/>
+    </svg>
+  </div>
+
+  <div class="shape-3d" id="shape2" style="top:45vh; left:4vw; width:80px; height:80px;">
+    <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#ff4747;stop-opacity:0.6"/>
+          <stop offset="100%" style="stop-color:#ff4747;stop-opacity:0"/>
+        </linearGradient>
+      </defs>
+      <!-- Tetrahedron -->
+      <polygon points="40,5 75,65 5,65" fill="url(#g2)" opacity="0.2" stroke="#ff4747" stroke-width="1"/>
+      <line x1="40" y1="5" x2="40" y2="65" stroke="#ff4747" stroke-width="0.8" opacity="0.4" stroke-dasharray="4,3"/>
+      <line x1="5" y1="65" x2="75" y2="65" stroke="#ff4747" stroke-width="1" opacity="0.5"/>
+    </svg>
+  </div>
+
+  <div class="shape-3d" id="shape3" style="top:70vh; right:12vw; width:100px; height:100px;">
+    <svg viewBox="0 0 100 100" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#e8ff47;stop-opacity:0.5"/>
+          <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
+        </linearGradient>
+      </defs>
+      <!-- Octahedron / Diamond -->
+      <polygon points="50,5 90,50 50,95 10,50" fill="url(#g3)" opacity="0.15" stroke="#e8ff47" stroke-width="0.8"/>
+      <line x1="10" y1="50" x2="90" y2="50" stroke="#e8ff47" stroke-width="0.5" opacity="0.3" stroke-dasharray="3,3"/>
+      <polygon points="50,5 90,50 50,50" fill="#e8ff47" opacity="0.08"/>
+      <polygon points="10,50 50,95 50,50" fill="#e8ff47" opacity="0.05"/>
+    </svg>
+  </div>
+
+  <div class="shape-3d" id="shape4" style="top:30vh; left:50vw; width:60px; height:60px; opacity:0.3;">
+    <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+      <!-- Torus ring -->
+      <ellipse cx="30" cy="30" rx="25" ry="10" fill="none" stroke="#e8ff47" stroke-width="1" opacity="0.6"/>
+      <ellipse cx="30" cy="30" rx="25" ry="10" fill="none" stroke="#e8ff47" stroke-width="3" stroke-dasharray="5,40" opacity="0.4"/>
+    </svg>
+  </div>
+
+  <div class="shape-3d" id="shape5" style="top:85vh; left:25vw; width:70px; height:70px;">
+    <svg viewBox="0 0 70 70" width="70" height="70" xmlns="http://www.w3.org/2000/svg">
+      <!-- Sphere wireframe -->
+      <circle cx="35" cy="35" r="28" fill="none" stroke="#e8ff47" stroke-width="0.8" opacity="0.4"/>
+      <ellipse cx="35" cy="35" rx="28" ry="10" fill="none" stroke="#e8ff47" stroke-width="0.6" opacity="0.3"/>
+      <ellipse cx="35" cy="35" rx="10" ry="28" fill="none" stroke="#e8ff47" stroke-width="0.6" opacity="0.3"/>
+      <line x1="7" y1="35" x2="63" y2="35" stroke="#e8ff47" stroke-width="0.5" opacity="0.2"/>
+      <line x1="35" y1="7" x2="35" y2="63" stroke="#e8ff47" stroke-width="0.5" opacity="0.2"/>
+    </svg>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Ilyes<span>.</span></div>
+    <ul>
+      <li><a href="#about">عني</a></li>
+      <li><a href="#portfolio">أعمالي</a></li>
+      <li><a href="#services">خدماتي</a></li>
+      <li><a href="#contact">تواصل</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-tag">مصمم جرافيك إبداعي</div>
+      <h1>أصنع<span class="line2">التصاميم</span></h1>
+      <p class="hero-sub">أحوّل أفكارك إلى هوية بصرية مميزة تترك أثراً لا يُنسى في ذهن جمهورك.</p>
+      <div class="hero-cta">
+        <a href="#portfolio" class="btn btn-primary">شاهد أعمالي</a>
+        <a href="#contact" class="btn btn-outline">تواصل معي</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>اسحب للأسفل</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee">
+      <span>BRAND IDENTITY</span><span class="dot">✦</span>
+      <span>LOGO DESIGN</span><span class="dot">✦</span>
+      <span>UI/UX DESIGN</span><span class="dot">✦</span>
+      <span>SOCIAL MEDIA</span><span class="dot">✦</span>
+      <span>TYPOGRAPHY</span><span class="dot">✦</span>
+      <span>MOTION GRAPHICS</span><span class="dot">✦</span>
+      <span>PRINT DESIGN</span><span class="dot">✦</span>
+      <span>PACKAGING</span><span class="dot">✦</span>
+      <span>BRAND IDENTITY</span><span class="dot">✦</span>
+      <span>LOGO DESIGN</span><span class="dot">✦</span>
+      <span>UI/UX DESIGN</span><span class="dot">✦</span>
+      <span>SOCIAL MEDIA</span><span class="dot">✦</span>
+      <span>TYPOGRAPHY</span><span class="dot">✦</span>
+      <span>MOTION GRAPHICS</span><span class="dot">✦</span>
+      <span>PRINT DESIGN</span><span class="dot">✦</span>
+      <span>PACKAGING</span><span class="dot">✦</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-visual reveal">
+      <div class="about-box main">
+        <div class="about-initials">IS</div>
+      </div>
+      <div class="about-badge">متاح للعمل ✦</div>
+      <div class="about-years">
+        <strong>5+</strong>
+        <span>سنوات خبرة</span>
+      </div>
+    </div>
+    <div class="about-text reveal">
+      <div class="section-label">من أنا</div>
+      <h2 class="section-title">مصمم<br/>بعقلية<br/>مختلفة</h2>
+      <p>أنا إلياس، مصمم جرافيك متخصص في بناء هويات بصرية قوية ومتكاملة. أؤمن بأن التصميم الجيد ليس مجرد شكل جميل، بل هو تواصل فعّال يحقق أهدافاً حقيقية.</p>
+      <p>عملت مع شركات ناشئة وعلامات تجارية راسخة، وأساعدهم على التميّز في سوق مكتظ بالمنافسين.</p>
+      <div class="skills-list">
+        <span class="skill-tag">Illustrator</span>
+        <span class="skill-tag">Photoshop</span>
+        <span class="skill-tag">InDesign</span>
+        <span class="skill-tag">Figma</span>
+        <span class="skill-tag">After Effects</span>
+        <span class="skill-tag">Premiere</span>
+        <span class="skill-tag">Blender</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PORTFOLIO -->
+  <section id="portfolio">
+    <div class="portfolio-header reveal">
+      <div>
+        <div class="section-label">معرض الأعمال</div>
+        <h2 class="section-title">أحدث<br/>المشاريع</h2>
+      </div>
+      <div class="filter-btns">
+        <button class="filter-btn active">الكل</button>
+        <button class="filter-btn">هوية بصرية</button>
+        <button class="filter-btn">سوشيال ميديا</button>
+        <button class="filter-btn">تغليف</button>
+      </div>
+    </div>
+    <div class="portfolio-grid reveal">
+      <div class="portfolio-item">
+        <div class="p-visual">
+          <img src="https://images.unsplash.com/photo-1634942537034-2531766767d1?w=900&auto=format&fit=crop" alt="هوية بصرية">
+        </div>
+        <div class="p-overlay">
+          <div class="p-arrow">↗</div>
+          <div class="p-cat">هوية بصرية</div>
+          <div class="p-title">مشروع الهوية الأول</div>
+          <div class="p-desc">تصميم هوية متكاملة لشركة تقنية ناشئة تشمل الشعار وكل التطبيقات.</div>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <div class="p-visual">
+          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&auto=format&fit=crop" alt="تغليف">
+        </div>
+        <div class="p-overlay">
+          <div class="p-arrow">↗</div>
+          <div class="p-cat">تغليف</div>
+          <div class="p-title">تصميم عبوات</div>
+          <div class="p-desc">تصميم عبوات منتجات عضوية بأسلوب طبيعي وعصري.</div>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <div class="p-visual">
+          <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=600&auto=format&fit=crop" alt="سوشيال ميديا">
+        </div>
+        <div class="p-overlay">
+          <div class="p-arrow">↗</div>
+          <div class="p-cat">سوشيال ميديا</div>
+          <div class="p-title">حملة إنستغرام</div>
+          <div class="p-desc">تصميم 30 منشوراً متكاملاً لحملة رمضانية.</div>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <div class="p-visual">
+          <img src="https://images.unsplash.com/photo-1609921212029-bb5a28e60960?w=600&auto=format&fit=crop" alt="ريبراندينج">
+        </div>
+        <div class="p-overlay">
+          <div class="p-arrow">↗</div>
+          <div class="p-cat">هوية بصرية</div>
+          <div class="p-title">ريبراندينج</div>
+          <div class="p-desc">إعادة تصميم هوية متجر عطور بأسلوب فاخر وعصري.</div>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <div class="p-visual">
+          <img src="https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=600&auto=format&fit=crop" alt="مطبوعات">
+        </div>
+        <div class="p-overlay">
+          <div class="p-arrow">↗</div>
+          <div class="p-cat">طباعة</div>
+          <div class="p-title">مطبوعات مؤتمر</div>
+          <div class="p-desc">تصميم كافة المطبوعات لمؤتمر تقني كبير.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="reveal">
+      <div class="section-label">ماذا أقدم</div>
+      <h2 class="section-title">خدماتي</h2>
+    </div>
+    <div class="services-grid reveal">
+      <div class="service-card">
+        <div class="service-num">01</div>
+        <span class="service-icon">◈</span>
+        <h3>الهوية البصرية</h3>
+        <p>تصميم شعار احترافي وهوية بصرية متكاملة تعكس قيم علامتك التجارية وتميّزها.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">02</div>
+        <span class="service-icon">◉</span>
+        <h3>سوشيال ميديا</h3>
+        <p>تصميم محتوى بصري جذاب لجميع منصات التواصل الاجتماعي بأسلوب متسق ومؤثر.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">03</div>
+        <span class="service-icon">◧</span>
+        <h3>تصميم التغليف</h3>
+        <p>تصميم عبوات ومواد تغليف تجذب الانتباه وتحكي قصة منتجك بشكل بصري مميز.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="reveal">
+      <div class="section-label">ابدأ مشروعك</div>
+      <h2 class="section-title">هل لديك<br/>فكرة؟</h2>
+      <p style="color:var(--muted); max-width:500px; margin:1rem auto; font-size:1rem; line-height:1.7">دعنا نحوّلها إلى تصميم يُبهر — تواصل معي الآن ونبدأ العمل على مشروعك.</p>
+      <a href="mailto:Iyesgraphix@gmail.com" class="contact-email">Iyesgraphix@gmail.com</a>
+      <a href="tel:+213563652732" class="contact-phone">+213563652732</a>
+      <div class="social-links">
+        <a href="https://www.behance.net/lyesgraphix" class="social-link" target="_blank">BEHANCE</a>
+        <a href="https://www.instagram.com/lyes.graphics" class="social-link" target="_blank">INSTAGRAM</a>
+        <a href="https://www.linkedin.com/in/ilyes-slama-01388a34a/" class="social-link" target="_blank">LINKEDIN</a>
+        <a href="https://www.tiktok.com/@lyesgrafixart" class="social-link" target="_blank">TIKTOK</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2026 إلياس — جميع الحقوق محفوظة</span>
+    <span style="color:var(--accent)">صُمِّم بشغف ✦</span>
+  </footer>
+
+  <script>
+    // ===== CURSOR =====
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animCursor() {
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animCursor);
+    }
+    animCursor();
+
+    // ===== SCROLL REVEAL =====
+    const reveals = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    reveals.forEach(r => obs.observe(r));
+
+    // ===== FILTER BUTTONS =====
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // ===== 3D FLOATING SHAPES PARALLAX =====
+    const shapes = [
+      { el: document.getElementById('shape1'), speedY: 0.08, speedX: 0.03, rotSpeed: 0.4, phase: 0 },
+      { el: document.getElementById('shape2'), speedY: 0.05, speedX: 0.06, rotSpeed: -0.3, phase: 1 },
+      { el: document.getElementById('shape3'), speedY: 0.10, speedX: 0.04, rotSpeed: 0.5, phase: 2 },
+      { el: document.getElementById('shape4'), speedY: 0.06, speedX: 0.08, rotSpeed: -0.6, phase: 0.5 },
+      { el: document.getElementById('shape5'), speedY: 0.07, speedX: 0.05, rotSpeed: 0.35, phase: 1.5 },
+    ];
+
+    let scrollY = 0;
+    let time = 0;
+
+    window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+
+    function animShapes() {
+      time += 0.008;
+      shapes.forEach(s => {
+        if (!s.el) return;
+        const floatY = Math.sin(time + s.phase) * 18;
+        const floatX = Math.cos(time * 0.7 + s.phase) * 8;
+        const parallax = scrollY * s.speedY;
+        const rot = Math.sin(time * 0.5 + s.phase) * 15;
+        const scale = 0.9 + Math.sin(time * 0.4 + s.phase) * 0.1;
+        s.el.style.transform = `translateY(${floatY - parallax}px) translateX(${floatX}px) rotate(${rot}deg) scale(${scale})`;
+      });
+      requestAnimationFrame(animShapes);
+    }
+    animShapes();
+  </script>
+</body>
+</html>
